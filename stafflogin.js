@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import styled from "styled-components";
+import { Link } from "react-router-dom";
 
-// 🎨 Styled Components
 const Container = styled.div`
   height: 100vh;
   display: flex;
@@ -11,8 +11,7 @@ const Container = styled.div`
   position: relative;
 `;
 
-// 🔹 Admin Login Button (Top-Right)
-const AdminButton = styled.a`
+const AdminButton = styled(Link)`
   position: absolute;
   top: 20px;
   right: 20px;
@@ -60,6 +59,12 @@ const Input = styled.input`
   font-size: 1rem;
 `;
 
+const ErrorMessage = styled.p`
+  color: red;
+  font-size: 0.8rem;
+  margin: 5px 0;
+`;
+
 const LoginButton = styled.button`
   width: 100%;
   padding: 10px;
@@ -78,11 +83,11 @@ const LoginButton = styled.button`
 
 const Links = styled.div`
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   margin-bottom: 10px;
 `;
 
-const Link = styled.a`
+const StyledLink = styled(Link)`
   color: black;
   font-size: 0.9rem;
   text-decoration: none;
@@ -91,20 +96,51 @@ const Link = styled.a`
   }
 `;
 
-// 🎨 Main Component
+
+const SuccessPopup = styled.div`
+  position: fixed;
+  top: 15%;  /* Increased space above the form */
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #28a745;
+  color: white;
+  padding: 15px 25px;
+  border-radius: 8px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+  opacity: ${(props) => (props.show ? 1 : 0)};
+  transition: opacity 0.5s ease-in-out;
+  margin-bottom: 20px;  /* Adds more space */
+`;
+
+
 const StaffLogin = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [showSuccess, setShowSuccess] = useState(false);
 
   const handleLogin = (e) => {
     e.preventDefault();
-    alert(`Logging in as: ${username}`);
+
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters");
+      return;
+    }
+
+    setError("");
+    setShowSuccess(true);
+
+    setTimeout(() => {
+      setShowSuccess(false);
+    }, 3000);
   };
 
   return (
     <Container>
-      <Overlay /> {/* Covers entire page with blur */}
-      <AdminButton href="/admin-login">Admin Login</AdminButton> {/* 🔥 New Admin Button */}
+      <Overlay />
+      <AdminButton to="/admin-login">Admin Login</AdminButton>
       <LoginCard>
         <h2>Staff Login</h2>
         <form onSubmit={handleLogin}>
@@ -122,13 +158,14 @@ const StaffLogin = () => {
             onChange={(e) => setPassword(e.target.value)}
             required
           />
+          {error && <ErrorMessage>{error}</ErrorMessage>}
           <Links>
-            <Link href="#">Forgot Password?</Link>
-            
+            <StyledLink to="/Forgot_password">Forgot Password?</StyledLink>
           </Links>
           <LoginButton type="submit">Login</LoginButton>
         </form>
       </LoginCard>
+      {showSuccess && <SuccessPopup show={showSuccess}>✅ Successfully Logged In</SuccessPopup>}
     </Container>
   );
 };
