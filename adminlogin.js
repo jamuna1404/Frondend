@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 
-// 🎨 Styled Components
 const Container = styled.div`
   height: 100vh;
   display: flex;
@@ -17,8 +16,8 @@ const Overlay = styled.div`
   left: 0;
   width: 100%;
   height: 100%;
-  backdrop-filter: blur(10px); /* Adjust blur strength */
-  background: rgba(255, 255, 255, 0.1); /* Slight tint */
+  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.1);
 `;
 
 const LoginCard = styled.div`
@@ -30,7 +29,7 @@ const LoginCard = styled.div`
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
   text-align: center;
   width: 300px;
-  z-index: 1; /* Ensures card appears above overlay */
+  z-index: 1;
 `;
 
 const Input = styled.input`
@@ -73,19 +72,56 @@ const Link = styled.a`
   }
 `;
 
-// 🎨 Main Component
+
+const SuccessPopup = styled.div`
+  position: fixed;
+  top: 15%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #28a745;
+  color: white;
+  padding: 15px 25px;
+  border-radius: 8px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+  opacity: ${(props) => (props.show ? 1 : 0)};
+  transition: opacity 0.5s ease-in-out;
+  margin-bottom: 20px;
+`;
+
+const ErrorMessage = styled.p`
+  color: red;
+  font-size: 0.9rem;
+  margin-top: -5px;
+`;
+
 const AdminLogin = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [showPopup, setShowPopup] = useState(false);
+  const [passwordError, setPasswordError] = useState("");
 
   const handleLogin = (e) => {
     e.preventDefault();
-    alert(`Logging in as: ${username}`);
+
+    if (password.length < 6) {
+      setPasswordError("Password must be at least 6 characters long.");
+      return;
+    }
+
+    setPasswordError("");
+    setShowPopup(true);
+
+    setTimeout(() => {
+      setShowPopup(false);
+    }, 2000);
   };
 
   return (
     <Container>
-      <Overlay /> {/* Covers entire page with blur */}
+      <Overlay />
+      {showPopup && <SuccessPopup show={showPopup}>Successfully Logged In!</SuccessPopup>}
       <LoginCard>
         <h2>Admin Login</h2>
         <form onSubmit={handleLogin}>
@@ -103,9 +139,9 @@ const AdminLogin = () => {
             onChange={(e) => setPassword(e.target.value)}
             required
           />
+          {passwordError && <ErrorMessage>{passwordError}</ErrorMessage>}
           <Links>
             <Link href="#">Forgot Password?</Link>
-            
           </Links>
           <LoginButton type="submit">Login</LoginButton>
         </form>
